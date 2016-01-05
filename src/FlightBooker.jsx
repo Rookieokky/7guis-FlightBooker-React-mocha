@@ -2,17 +2,18 @@ import React, { PropTypes } from 'react';
 import {toShortDate, fromShortDate} from './dateUtils';
 
 const propTypes = {
-  initialFromDate: PropTypes.instanceOf(Date),
-  initialToDate: PropTypes.instanceOf(Date)
+  initialFromDate: PropTypes.string,
+  initialToDate: PropTypes.string
 };
 
 const defaultProps = {
-  initialFromDate: new Date(2016, 0, 1),
-  initialToDate: new Date(2016, 0, 1)
+  initialFromDate: '01.01.2016',
+  initialToDate: '01.01.2016'
 };
 
 const ONE_WAY_FLIGHT = 'one-way-flight';
 const RETURN_FLIGHT = 'return-flight';
+const INVALID_DATE_COLOR = 'red';
 
 class FlightBooker extends React.Component {
 
@@ -26,24 +27,21 @@ class FlightBooker extends React.Component {
   }
 
   bookFlight() {
+    this.setState({
+      bookedMessage: `You have booked a ${this.state.flightType} flight on ${this.state.fromDate}.`
+    });
   }
 
   fromDateChanged(e) {
-    const fromDate = fromShortDate(e.target.value);
-    if(fromDate){
-      this.setState({
-        fromDate: fromDate
-      });
-    }
+    this.setState({
+      fromDate: e.target.value
+    });
   }
 
   toDateChanged(e) {
-    const toDate = fromShortDate(e.target.value);
-    if(toDate) {
-      this.setState({
-        toDate: toDate
-      });
-    }
+    this.setState({
+      toDate: e.target.value
+    });
   }
 
   flightTypeChanged(e) {
@@ -56,8 +54,21 @@ class FlightBooker extends React.Component {
     return this.state.flightType === ONE_WAY_FLIGHT;
   }
 
+  fromDateBgColor(){
+    return fromShortDate(this.state.fromDate) ? '' : INVALID_DATE_COLOR;
+  }
+
+  toDateBgColor(){
+    return !this.toDateIsDisabled() && !fromShortDate(this.state.toDate) ? INVALID_DATE_COLOR : '';
+  }
+
   bookActionIsDisabled(){
-    return this.state.flightType === RETURN_FLIGHT && this.state.toDate < this.state.fromDate;
+    const fromDate = fromShortDate(this.state.fromDate);
+    const toDate = fromShortDate(this.state.toDate);
+    if(!fromDate || (this.state.flightType === RETURN_FLIGHT && !toDate)) {
+      return true;
+    }
+    return this.state.flightType === RETURN_FLIGHT && toDate < fromDate;
   }
 
   render() {
@@ -73,14 +84,14 @@ class FlightBooker extends React.Component {
         </select>
     		<input
           type="text"
-          style={ {width: '100%'} }
-          value={ toShortDate(this.state.fromDate) }
+          style={ {width: '100%', backgroundColor:this.fromDateBgColor.call(this)} }
+          value={ this.state.fromDate }
           onChange={ (e)=>{this.fromDateChanged(e)} }
           placeholder="dd.mm.yyyy" />
         <input
           type="text"
-          style={ {width: '100%'} }
-          value={ toShortDate(this.state.toDate) }
+          style={ {width: '100%', backgroundColor:this.toDateBgColor.call(this)} }
+          value={ this.state.toDate }
           onChange={ (e)=>{this.toDateChanged(e)} }
           disabled={ this.toDateIsDisabled.call(this) }
           placeholder="dd.mm.yyyy" />
@@ -90,6 +101,7 @@ class FlightBooker extends React.Component {
           disabled={ this.bookActionIsDisabled.call(this) }>
           Book
         </button>
+        <span>{this.state.bookedMessage}</span>
     	</div>
     );
   }

@@ -1,7 +1,7 @@
 {
   "name": "7guis-FlightBooker-React-mocha",
   "description": "7guis FlightBooker exercise made with ReactJS UI library and Mocha tests",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./src/index.jsx",
   "engines": {
     "node": "4.2.3"
