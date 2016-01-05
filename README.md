@@ -46,7 +46,7 @@ You can run tests once:
 npm test
 ```
 
-or watch for all js, jsx file changes:
+or watch for all js, jsx file changes: 
 
 ```bash
 npm test:watch
